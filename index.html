@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hospital OT Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background-color: #f0f2f5; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; }
+        .nav { text-align: right; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #1a73e8; color: white; }
+        .doctor-card { display: inline-block; width: 30%; margin: 1%; padding: 15px; background: #e8f0fe; border-radius: 8px; box-sizing: border-box; }
+        .status-on { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav">
+        <a href="login.html" style="color: #1a73e8; text-decoration: none; font-weight: bold;">Staff Login (Admin) →</a>
+    </div>
+
+    <h2>👨‍⚕ Doctor Details & Availability</h2>
+    <div id="doctorSection">
+        <div class="doctor-card">
+            <strong>Dr. Arjun Smith</strong><br>
+            Specialization: Senior Surgeon<br>
+            Status: <span class="status-on">Available</span>
+        </div>
+        <div class="doctor-card">
+            <strong>Dr. Sarah Connor</strong><br>
+            Specialization: Anesthesiologist<br>
+            Status: <span class="status-on">In Surgery</span>
+        </div>
+        <div class="doctor-card">
+            <strong>Dr. Rajesh Kumar</strong><br>
+            Specialization: Orthopedic<br>
+            Status: <span class="status-on">Available</span>
+        </div>
+    </div>
+
+    <h2>📅 Current Operation Theater Schedule</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date & Time</th>
+                <th>OT ID</th>
+                <th>Anesthesia</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody id="scheduleTable">
+            </tbody>
+    </table>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJyy_9rye2cH8c9RcDx3GIBZBs-Z7mZ2M",
+    authDomain: "hospital-scheduler-9769a.firebaseapp.com",
+    projectId: "hospital-scheduler-9769a",
+    storageBucket: "hospital-scheduler-9769a.firebasestorage.app",
+    messagingSenderId: "151631510712",
+    appId: "1:151631510712:web:e1e256dfa1f1536150c84d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const tableBody = document.getElementById('scheduleTable');
+  const q = query(collection(db, "schedules"), orderBy("surgeryTime", "asc"));
+  
+  onSnapshot(q, (snapshot) => {
+    tableBody.innerHTML = ""; 
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const row = `<tr>
+          <td>${new Date(data.surgeryTime).toLocaleString()}</td>
+          <td>${data.otId}</td>
+          <td>${data.anesthesia}</td>
+          <td>${data.remarks}</td>
+        </tr>`;
+      tableBody.innerHTML += row;
+    });
+    console.log("Requirement Met: Live Data Logging for User View.");
+  });
+</script>
+
+</body>
+</html>
